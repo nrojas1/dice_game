@@ -17,7 +17,7 @@ class Game:
         for player in self.players:
             print(f"It is now {player.name}'s turn")
             player.throw(6)
-            while player.valid_throw(player) or len(player.hand) == 0:
+            while player.valid_throw() or len(player.hand) == 0:
                 if len(player.hand) == 0: # NOT WORKING
                     player.throw(6)
                 # TODO: FIND A SOLUTION FOR WHEN HAND IN EMPTY
@@ -38,13 +38,12 @@ class Game:
                 player.running_score += player.throw_to_score(input_temp)
                 if player.above_water(self.first_turn):
                     while True:
-                        user_stop = input(f"""Would you like to stop with
-                        {player.running_score} points?\n1: Yes\n2: No\n""")
+                        user_stop = input(f"""Would you like to stop with {player.running_score} points?\n1: Yes\n2: No\n""")
                         try:
                             user_stop = int(user_stop)
                             if user_stop not in [1, 2]:
                                 continue
-                            elif user_stop == 1:
+                            elif user_stop == 1: # TODO: YEA this needs fixing...
                                 player.update_score(player.running_score)
                                 break
                             elif user_stop == 2:
