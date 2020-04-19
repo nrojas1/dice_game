@@ -58,6 +58,7 @@ class Game:
     #     return self.score
     #
     def topscore(self):
+        """ Sets Game topscore to the highest score on the scoreboard """
         latest_round_score = self.scoreboard[-1]
         latest_round_score = sorted((score, name) for (name, score) in latest_round_score.items())
         top = latest_round_score[-1][0]
@@ -134,9 +135,7 @@ class Player:
         return result
 
     def play_round(self, game):
-        """
-            Game action function for individual player
-        """
+        """ Game action function for individual player """
         # play while you have a valid throw or your hand is empty
         while self.valid_throw() or len(self.hand) == 0:
             if len(self.hand) == 0:
@@ -199,15 +198,15 @@ class Player:
     #     return self.name
 
 class Error(Exception):
-    """Base class for other exceptions"""
+    """ Base class for other exceptions """
     pass
 
 class ValueNotInError(Error):
-    """Raised when the user input's values don't match the Game hand values"""
+    """ Raised when the user input's values don't match the Game hand values """
     pass
 
 class ValueNotCorrect(Error):
-    """Raised when user's input is not a Game scoring dice"""
+    """ Raised when user's input is not a Game scoring dice """
     pass
 
 def main():
@@ -235,7 +234,7 @@ def main():
             dice_game.players.append(player)
 
         # simple game loop
-        while dice_game.top_score <= 500:
+        while dice_game.top_score <= 10000:
             dice_game.round()
         final_result = dice_game.podium()
         print(final_result)
@@ -243,17 +242,17 @@ def main():
         time.sleep(1); print("\n\n\nAnother one?"); time.sleep(3)
 
 
-def valid_selection(list):
-    """ Verifies if Player.hand has playable numbers """
+def valid_selection(lst):
+    """ Verifies if list has dice of interest to the Game """
     # looking for triples
-    trpl_dices = [dice for dice in list if list.count(dice) in [3, 4, 5, 6]]
+    trpl_dices = [dice for dice in lst if lst.count(dice) in [3, 4, 5, 6]]
 
     # looking for golden dice
-    gold_dices = [dice for dice in list if dice in [5, 1]]
+    gold_dices = [dice for dice in lst if dice in [5, 1]]
 
     # looking for 123456
     one_to_six = (1, 2, 3, 4, 5, 6)
-    diamond_dices = all(elem in list for elem in one_to_six)
+    diamond_dices = all(elem in lst for elem in one_to_six)
 
     return True if trpl_dices or gold_dices or diamond_dices else False
 
