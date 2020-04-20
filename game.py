@@ -15,20 +15,25 @@ class Game:
         """ Runs a game round where each player has a go """
         for player in self.players:
             print(f"\nIt is now {player.name}'s turn")
+            player.lost_round = 0
             player.throw(6)
             player.play_round(self)
-            print(f"{player.hand}\nEnd of {player.name}'s turn... you bitch\n")
+            if player.lost_round == 0:
+                print(f"\nEnd of {player.name}'s turn... you bitch\n")
+            else:
+                print(f"You suck!\nEnd of {player.name}'s turn... you bitch\n")
             time.sleep(2)
             player.running_score = 0
+            player.lost_round = 0
         [player.dice_kept.clear() for player in self.players]
         print(f"end of round {self.n_round}")
         self.n_round += 1
+        self.update_scoreboard(self.scoreboard)
         if self.n_round > 2:
             self.topscore()
-        self.update_scoreboard(self.scoreboard)
         print(f"Scoreboard: {self.scoreboard}")
         time.sleep(3)
-        if self.top_score <= 10000:
+        if self.top_score <= 1000:
             print('Starting next round...'); time.sleep(2)
 
     def update_scoreboard(self, scoreboard):
@@ -74,8 +79,9 @@ class Player:
         self.running_score = 0
         self.hand = list()
         self.dice_kept = list()
-        self.stop_round = 0
         self.is_on_scoreboard = 0
+        self.lost_round = 0
+        self.stop_round = 0
 
     def update_score(self, val):
         """ Add Player.running_score to Player.score """
@@ -169,7 +175,7 @@ class Player:
                 except ValueNotCorrect:
                     print('Ones, fives and triples are only allowed in selection\n')
             self.running_score += self.throw_to_score(hand_match)
-            if self.above_water() and len(self.hand) != 0:
+            if self.above_water() and len(self.hand) != 0 and not bool(self.stop_round):
                 while True:
                     user_stop = input(f"""\nWould you like to stop with {self.running_score} points?\n1: Yes\n2: No\n""")
                     try:
@@ -177,20 +183,35 @@ class Player:
                         if user_stop not in [1, 2]:
                             continue
                     except ValueError:
-                        print('1: Continue\n2: Stop here')
+                        print('1: Stop\n2: Continue playing')
                         continue
                     if user_stop == 1:
                         self.update_score(self.running_score)
                         self.is_on_scoreboard = 1
+                        self.stop_round = 1
                         break
 
                     elif user_stop == 2:
                         self.throw(len(self.hand))
-                        self.stop_round = 1
+                        self.stop_round = 0
                         break
             else:
-                print('replaying...')
+                print('Replaying...')
                 self.throw(len(self.hand))
+                self.stop_round = 0
+        else:
+            if not bool(self.stop_round):
+                print(self.hand)
+                time.sleep(1)
+                print('.\n')
+                time.sleep(1)
+                print('.\n')
+                time.sleep(1)
+                print("\nSorry mate, seems you ain't got shiiiii")
+                self.lost_round = 1
+            else:
+                print(f"Saving {self.name}'s score of {self.score}")
+                time.sleep(1)
     # def get_score(self):
     #     return self.score
     #
@@ -234,7 +255,7 @@ def main():
             dice_game.players.append(player)
 
         # simple game loop
-        while dice_game.top_score <= 10000:
+        while dice_game.top_score <= 1000:
             dice_game.round()
         final_result = dice_game.podium()
         print(final_result)
@@ -254,7 +275,7 @@ def valid_selection(lst):
     one_to_six = (1, 2, 3, 4, 5, 6)
     diamond_dices = all(elem in lst for elem in one_to_six)
 
-    return True if trpl_dices or gold_dices or diamond_dices else False
+    return bool(trpl_dices) or bool(gold_dices) or bool(diamond_dices)
 
 
 
