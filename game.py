@@ -16,9 +16,10 @@ class Game:
         for player in self.players:
             print(f"\nIt is now {player.name}'s turn")
             player.lost_round = 0
+            player.stop_round = 0
             player.throw(6)
             player.play_round(self)
-            if player.lost_round == 0:
+            if not bool(player.lost_round) or not bool(player.stop_round):
                 print(f"\nEnd of {player.name}'s turn... you bitch\n")
             else:
                 print(f"You suck!\nEnd of {player.name}'s turn... you bitch\n")
@@ -104,14 +105,17 @@ class Player:
         one_to_six = (1, 2, 3, 4, 5, 6)
         diamond_dices = all(elem in self.hand for elem in one_to_six)
 
-        return True if trpl_dices or gold_dices or diamond_dices else False
+        return bool(trpl_dices) or bool(gold_dices) or bool(diamond_dices)
 
     def above_water(self):
         """
             Tests if the player has enough points to save them as well as
             checking if it is his first score on the scoreboard
         """
-        return True if (self.is_on_scoreboard == 0 and self.running_score >= 450) or (self.is_on_scoreboard == 1 and self.running_score >= 350) else False
+        if (not bool(self.is_on_scoreboard) and self.running_score >= 450) or (bool(self.is_on_scoreboard) and self.running_score >= 350):
+            return True
+        else:
+            return False
 
     def throw_to_score(self, hand):
         """ Takes dice values and returns its game score """
@@ -169,11 +173,11 @@ class Player:
                         self.hand.pop(self.hand.index(int(dice)))
                     break
                 except ValueError:
-                    print('The dice entered must be numbers\n')
+                    print('\tThe dice entered must be numbers\n')
                 except ValueNotInError:
-                    print("The dice don't match the hand... try again\n")
+                    print("\tThe dice don't match the hand... try again\n")
                 except ValueNotCorrect:
-                    print('Ones, fives and triples are only allowed in selection\n')
+                    print('\tOnes, fives and triples are only allowed in selection\n')
             self.running_score += self.throw_to_score(hand_match)
             if self.above_water() and len(self.hand) != 0 and not bool(self.stop_round):
                 while True:
@@ -183,7 +187,7 @@ class Player:
                         if user_stop not in [1, 2]:
                             continue
                     except ValueError:
-                        print('1: Stop\n2: Continue playing')
+                        print('\t1: Stop\n\t2: Continue playing')
                         continue
                     if user_stop == 1:
                         self.update_score(self.running_score)
@@ -210,7 +214,7 @@ class Player:
                 print("\nSorry mate, seems you ain't got shiiiii")
                 self.lost_round = 1
             else:
-                print(f"Saving {self.name}'s score of {self.score}")
+                print(f"Addind {self.running_score} to {self.name}'s score. Score: {self.score}")
                 time.sleep(1)
     # def get_score(self):
     #     return self.score
