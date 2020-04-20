@@ -1,6 +1,8 @@
 """ The famous dice game in command line format using classes """
 import random; import time; import sys
 
+TOPSCORE = 1000
+
 class Game:
     """ Game class"""
 
@@ -34,7 +36,7 @@ class Game:
             self.topscore()
         print(f"Scoreboard: {self.scoreboard}")
         time.sleep(3)
-        if self.top_score <= 1000:
+        if self.top_score <= TOPSCORE:
             print('Starting next round...'); time.sleep(2)
 
     def update_scoreboard(self, scoreboard):
@@ -49,15 +51,24 @@ class Game:
         """ Prints end of game stats """
         finish_line = self.scoreboard[-1]
         finish_line = sorted((score, name) for (name, score) in finish_line.items())
-        winner = finish_line[-1]
-        second = finish_line[-2]
-        third = finish_line[-3]
-        string = ''
-        string += "\n\n\n-----------------------GAME--OVER--------------------\n"
-        string += f"NUMBER OF ROUNDS PLAYED: {self.n_round}\n\n\n\n"
-        string += f"WINNER: {winner[1]} with {winner[0]} points\n\n\n"
-        string += f"SECOND: {second[1]} with {second[0]} points\n\n"
-        string += f"THIRD: {third[1]} with {third[0]} points\n"
+        if self.n_players != 2:
+            winner = finish_line[-1]
+            second = finish_line[-2]
+            third = finish_line[-3]
+            string = ''
+            string += "\n\n\n-----------------------GAME--OVER--------------------\n"
+            string += f"NUMBER OF ROUNDS PLAYED: {self.n_round - 1}\n\n\n\n"
+            string += f"WINNER: {winner[1]} with {winner[0]} points\n\n\n"
+            string += f"SECOND: {second[1]} with {second[0]} points\n\n"
+            string += f"THIRD: {third[1]} with {third[0]} points\n"
+        else:
+            winner = finish_line[-1]
+            second = finish_line[-2]
+            string = ''
+            string += "\n\n\n-----------------------GAME--OVER--------------------\n"
+            string += f"NUMBER OF ROUNDS PLAYED: {self.n_round - 1}\n\n\n\n"
+            string += f"WINNER: {winner[1]} with {winner[0]} points\n\n\n"
+            string += f"SECOND: {second[1]} with {second[0]} points\n\n"
         return string
 
     # def get_score(self):
@@ -259,12 +270,12 @@ def main():
             dice_game.players.append(player)
 
         # simple game loop
-        while dice_game.top_score <= 1000:
+        while dice_game.top_score <= TOPSCORE:
             dice_game.round()
         final_result = dice_game.podium()
         print(final_result)
         time.sleep(3); print('\n\nEnd of game')
-        time.sleep(1); print("\n\n\nAnother one?"); time.sleep(3)
+        time.sleep(1); print("\n\n\nAnother one?"); time.sleep(1.5)
 
 
 def valid_selection(lst):
